@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termoquímica Interativa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .section-title {
+            color: #4fd1c5;
+        }
+        .card {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.75rem;
+        }
+        .card-front {
+            background-color: #2d3748;
+            border: 2px solid #4fd1c5;
+        }
+        .card-back {
+            background-color: #4fd1c5;
+            color: #1a202c;
+            transform: rotateY(180deg);
+            border: 2px solid #4fd1c5;
+        }
+        .question-option {
+            transition: background-color 0.3s;
+        }
+        .question-option:hover {
+            background-color: #4a5568;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 flex items-center justify-center min-h-screen">
+    <div class="container mx-auto p-4 bg-gray-800 rounded-xl shadow-lg">
+
+        <!-- Header e Resumo -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold section-title mb-2">Termoquímica Interativa</h1>
+            <p class="text-lg sm:text-xl text-gray-400">Um guia completo sobre entalpia e reações químicas.</p>
+        </header>
+        
+        <section class="mb-12 p-6 bg-gray-700 rounded-lg">
+            <h2 class="text-2xl font-bold section-title mb-4">Resumo</h2>
+            <p class="text-md sm:text-lg leading-relaxed">
+                A **termoquímica** é o ramo da química que estuda as mudanças de energia nas reações químicas. O conceito central é a **entalpia ($$H$$)**, que é a energia total de um sistema. A **variação de entalpia ($$\Delta H$$)** indica o calor liberado ou absorvido.
+                <br><br>
+                **Reações exotérmicas** liberam calor ($$\Delta H < 0$$), pois a entalpia dos produtos é menor que a dos reagentes (ex: combustão).
+                <br><br>
+                **Reações endotérmicas** absorvem calor ($$\Delta H > 0$$), pois a entalpia dos produtos é maior que a dos reagentes (ex: fotossíntese).
+                <br><br>
+                A **Lei de Hess** é fundamental para o cálculo de $$\Delta H$$. Ela afirma que a variação de entalpia total de uma reação é a mesma, independentemente das etapas. Podemos calculá-la pela soma das entalpias de formação dos produtos menos a dos reagentes.
+            </p>
+        </section>
+
+        <!-- Flashcards -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold section-title text-center mb-6">Flashcards</h2>
+            <div id="flashcard-container" class="relative h-64 sm:h-80 w-full mb-4">
+                <!-- Flashcard será inserido aqui pelo JS -->
+            </div>
+            <div class="flex justify-center space-x-4">
+                <button onclick="changeFlashcard(-1)" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full transition duration-300 shadow-lg">&larr; Anterior</button>
+                <button onclick="changeFlashcard(1)" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full transition duration-300 shadow-lg">Próximo &rarr;</button>
+            </div>
+        </section>
+
+        <!-- Questões -->
+        <section>
+            <h2 class="text-2xl font-bold section-title text-center mb-6">Questões</h2>
+            <div id="quiz-container">
+                <!-- Questões serão inseridas aqui pelo JS -->
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Array de flashcards
+        const flashcards = [
+            { front: 'O que é entalpia?', back: 'É a energia total de um sistema químico.' },
+            { front: 'O que é uma reação exotérmica?', back: 'É uma reação que libera calor. Sua variação de entalpia (ΔH) é negativa.' },
+            { front: 'O que é uma reação endotérmica?', back: 'É uma reação que absorve calor. Sua variação de entalpia (ΔH) é positiva.' },
+            { front: 'O que a Lei de Hess permite calcular?', back: 'A variação de entalpia de uma reação, mesmo que ela ocorra em várias etapas.' },
+            { front: 'Qual é o ΔH de formação de uma substância simples no estado padrão?', back: 'Zero.' }
+        ];
+
+        let currentFlashcardIndex = 0;
+        const flashcardContainer = document.getElementById('flashcard-container');
+
+        // Renderiza o flashcard
+        function renderFlashcard() {
+            const cardData = flashcards[currentFlashcardIndex];
+            flashcardContainer.innerHTML = `
+                <div class="card h-full w-full" onclick="this.classList.toggle('flipped')">
+                    <div class="card-face card-front shadow-lg">
+                        <span class="text-xl font-semibold">${cardData.front}</span>
+                    </div>
+                    <div class="card-face card-back shadow-lg">
+                        <span class="text-lg sm:text-xl font-semibold">${cardData.back}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Altera o flashcard atual
+        function changeFlashcard(direction) {
+            currentFlashcardIndex += direction;
+            if (currentFlashcardIndex < 0) {
+                currentFlashcardIndex = flashcards.length - 1;
+            } else if (currentFlashcardIndex >= flashcards.length) {
+                currentFlashcardIndex = 0;
+            }
+            renderFlashcard();
+        }
+
+        // Array de questões
+        const questions = [
+            {
+                question: 'Uma reação em que a variação de entalpia é negativa (ΔH < 0) é:',
+                options: ['Endotérmica', 'Exotérmica', 'Isotérmica', 'Reversível'],
+                answer: 'Exotérmica'
+            },
+            {
+                question: 'A Lei de Hess se baseia no fato de que o ΔH de uma reação depende:',
+                options: ['Apenas da pressão e temperatura', 'Apenas do estado inicial e final', 'Da velocidade da reação', 'Do caminho percorrido'],
+                answer: 'Apenas do estado inicial e final'
+            },
+            {
+                question: 'Se a entalpia dos produtos é maior que a dos reagentes, a reação é:',
+                options: ['Exotérmica', 'Isotérmica', 'Endotérmica', 'Equilibrada'],
+                answer: 'Endotérmica'
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        // Renderiza as questões do quiz
+        function renderQuiz() {
+            questions.forEach((q, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'bg-gray-700 p-6 rounded-lg mb-6 shadow-lg';
+                questionElement.innerHTML = `
+                    <p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p>
+                    <div class="space-y-3">
+                        ${q.options.map(option => `
+                            <button onclick="checkAnswer(this, '${q.answer}')" class="question-option w-full text-left p-3 rounded-md bg-gray-600 hover:bg-gray-500 transition-all duration-300">
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                quizContainer.appendChild(questionElement);
+            });
+        }
+
+        // Verifica a resposta
+        function checkAnswer(button, answer) {
+            const parent = button.closest('div');
+            const buttons = parent.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent.trim() === answer) {
+                    btn.classList.remove('bg-gray-600', 'hover:bg-gray-500');
+                    btn.classList.add('bg-green-600');
+                } else {
+                    btn.classList.remove('bg-gray-600', 'hover:bg-gray-500');
+                    btn.classList.add('bg-red-600', 'opacity-50');
+                }
+            });
+        }
+
+        // Inicializa a aplicação
+        window.onload = function() {
+            renderFlashcard();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>
